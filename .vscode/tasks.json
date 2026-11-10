@@ -3,8 +3,8 @@
   "tasks": [{
     "label": "CFA Pocketを起動",
     "type": "shell",
-    "command": "node",
-    "args": ["server.mjs"],
+    "command": "npm",
+    "args": ["start"],
     "isBackground": true,
     "problemMatcher": [],
     "presentation": { "reveal": "always" }

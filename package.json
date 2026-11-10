@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prestart": "npm run build",
     "start": "node server.mjs",
+    "pretest": "npm run build",
     "test": "node --test",
+    "check:repository": "node scripts/check-repository.mjs",
     "build": "node scripts/build-mobile.mjs",
     "build:android-web": "node scripts/build-android-web.mjs",
     "android:sync": "npm run build:android-web && cap sync android",

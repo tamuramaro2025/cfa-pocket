@@ -22,14 +22,17 @@ URLだけでは停止したサーバーは起動しません。開けない場�
 Node.js 22以上で、追加パッケージなしで動きます。
 
 ```sh
+node scripts/build-mobile.mjs
 node server.mjs
 ```
 
 ブラウザで http://127.0.0.1:4173 を開いてください。VS Codeの「CFA Pocketを起動」タスクでも起動できます。
 
 ```sh
-node --test
+npm test
 ```
+
+`npm start`・`npm test` は必要なWebアイコンとオフライン一覧を先に生成します。依存パッケージ、APK、各ビルド出力、生成アセット、端末内データ、認証設定はGit管理しません。GitHubへの送信前の点検は `npm run check:repository`。除外方針と今回の確認結果は [GitHubアップロード準備](docs/github-preparation.md) を参照してください。
 
 ## 実装済み
 
