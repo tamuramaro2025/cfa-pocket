@@ -1,0 +1,100 @@
+import { unit as u, outline } from './content-kit.js';
+const src = [outline];
+export const marketUnits = [
+  u('fixed','contracts','債券契約・キャッシュフロー',['契約条項と支払構造を読む','発行体と投資家の選択権を区別する'],['債券契約には額面、満期、通貨、クーポン、優先順位、担保、コベナンツを定める。肯定的条項は実行義務、否定的条項は行動制限。','一括償還は元本を満期に返し、分割償還は途中でも元本を返す。変動利付債は参照金利とスプレッドでクーポンを更新する。','コールは発行体の早期償還権、プットは投資家の売戻し権。転換条項は株式への転換などを可能にする。'],'変動クーポン率 = 参照金利 + 契約スプレッド（制限条項がなければ）','契約スプレッドと市場が要求する信用スプレッドは同じとは限らない。',[
+    ['A covenant prohibiting additional secured borrowing is a:', ['Negative covenant','Coupon payment','Conversion ratio'],0,['行動を制限する否定的条項です。','クーポン額そのものではありません。','株式転換比率ではありません。'],'negative covenant','否定的コベナンツ'],
+    ['A floating-rate note pays reference rate plus 150 basis points. If the reference rate is 3%, its coupon rate is:', ['3.15%','4.50%','150%'],1,['150bpは1.50%です。','3%+1.50%=4.50%です。','150bpは150%ではありません。'],'floating-rate note','変動利付債']
+  ],src),
+  u('fixed','funding','債券市場・国債・レポ',['発行体と資金調達手段を比較する','レポと担保価値の関係を理解する'],['国債、地方債、政府機関債、国際機関債、社債では税・信用・市場構造が異なる。高利回り債は一般に投資適格債より信用損失への感応度が高い。','短期の資金調達にはコマーシャルペーパー、銀行借入、レポなどがある。短期資金への依存は借換えリスクを伴う。','レポは証券売却と買戻し約束を組み合わせた担保付き資金調達。ヘアカットは担保価値に対する資金額の余裕で、相手先リスクや担保価格リスクは残る。'],'ヘアカット10%なら、担保価値100に対する資金は90','担保があっても取引相手の不履行や担保換金損はなくならない。',[
+    ['A repo backed by securities worth 100 has a 10% haircut. Initial cash lent is:', ['90','100','110'],0,['100×(1−0.10)=90です。','ヘアカットを反映していません。','ヘアカットは資金額を担保価値より低くします。'],'repo haircut','レポのヘアカット'],
+    ['Funding a long-lived asset with repeated short-term borrowing primarily exposes the issuer to:', ['No refinancing risk','Rollover risk','Guaranteed lower lifetime costs'],1,['満期ごとの更新が必要です。','短期債務を借り換えられないリスクがあります。','将来の借入条件は保証されません。'],'rollover risk','借換えリスク']
+  ],src),
+  u('fixed','pricing','債券評価・経過利息・マトリックス価格',['将来CFを割り引いて評価する','クリーン価格と支払価格を分ける'],['固定利付債はクーポンと償還額の割引現在価値を合計する。年率表示と1年の支払回数から1期間の利回りと期間数を揃える。','支払価格（ダーティ）はクリーン価格に経過利息を加える。経過利息の計算は契約の日数計算慣行による。','取引の少ない債券は類似する信用・満期の債券から利回りを推定するマトリックス価格を使うことがある。推定の不確実性は残る。'],'ダーティ価格 = クリーン価格 + 経過利息','利払日間の価格は経過期間と日数慣行を無視して計算しない。',[
+    ['A bond has a clean price of 98 and accrued interest of 1.2 per 100 of face value. The dirty price is:', ['96.8','98.0','99.2'],2,['経過利息は足します。','経過利息が抜けています。','98+1.2=99.2です。'],'accrued interest','経過利息'],
+    ['Estimating the yield of an infrequently traded bond from comparable bonds is called:', ['Matrix pricing','Stock splitting','Currency translation'],0,['類似債券から価格・利回りを推定する方法です。','株式数の変更ではありません。','外貨換算ではありません。'],'matrix pricing','マトリックス価格']
+  ],src),
+  u('fixed','yields','利回り・スプレッド・変動債',['利回りの定義と換算を使い分ける','信用・流動性とスプレッドを結びつける'],['最終利回りYTMは約定CFのIRRで、実現収益率は再投資金利、売却価格、不履行などに左右される。直接利回りは償還差損益を含まない。','Gスプレッドは基準国債利回りとの差。Zスプレッドは各スポット金利への一定上乗せで価格を合わせる。OASはモデル上のオプションの影響を調整する。','変動利付債では基準金利の更新で金利感応度が小さくなり得るが、信用スプレッド、更新間隔、上限下限の影響は残る。'],'実効年率 = (1 + 名目年率/m)^m − 1','bpと%を区別し、信用リスクが高い理由を利回りだけで判断しない。',[
+    ['A corporate yield is 6.2% and a comparable government yield is 4.0%. The G-spread is:', ['22 bp','220 bp','1,020 bp'],1,['2.2%は220bpです。','6.2−4.0=2.2パーセントポイント=220bpです。','利回りを足す計算ではありません。'],'yield spread','利回りスプレッド'],
+    ['A 6% nominal annual rate compounded semiannually has effective annual yield closest to:', ['6.00%','6.09%','12.00%'],1,['半年複利による追加の利息があります。','(1+0.06/2)²−1=6.09%です。','年率を2倍にはしません。'],'effective annual yield','実効年利回り']
+  ],src),
+  u('fixed','curves','スポット・フォワード・利回り曲線',['期間別の割引率を使う','無裁定の先渡金利を計算する'],['スポット金利は各満期の単一CFを割り引く金利。利付債のYTMはCF全体に適用する一つの内部収益率で、スポット曲線と同じではない。','フォワード金利はスポット金利の裁定関係から導く将来期間の金利。将来の実際の短期金利を保証するものではない。','利回り曲線は金利期待やタームプレミアムなどを反映し、平行移動だけでなく傾き・曲率も変わる。'],'(1+s₂)² = (1+s₁)(1+f₁,₂) （年複利）','異なる期間の年率と複利回数を揃える。',[
+    ['One-year and two-year spot rates are 4% and 5%, annually compounded. The one-year forward rate starting in one year is closest to:', ['4.00%','5.00%','6.01%'],2,['1年スポット金利をそのまま使うのではありません。','2年スポット金利とは異なります。','1.05²/1.04−1≈6.01%です。'],'forward rate','先渡金利'],
+    ['A spot rate is most directly used to discount:', ['A single cash flow at its matching maturity','All cash flows using any arbitrary maturity','Only dividends, never bonds'],0,['CFの時点に対応するスポット金利で割り引きます。','時点に合った金利を用います。','債券CFの評価でも使います。'],'spot rate','スポット金利']
+  ],src),
+  u('fixed','duration','デュレーション・コンベクシティ',['金利リスクを近似する','保有期間と再投資リスクを結ぶ'],['修正デュレーションは利回り変化に対する価格の一次感応度。コンベクシティは曲がりを調整し、大きな金利変化では一次近似との差が広がる。','実効デュレーションはオプション行使でCFが変わり得る債券などにモデルで求める。キーレート・デュレーションは曲線の特定年限への感応度。','金利上昇は価格を下げるが再投資利回りを上げる。投資期間とマコーレー・デュレーションの関係を考え、価格リスクと再投資リスクを区別する。'],'ΔP/P ≈ −Dmod Δy + 0.5 C (Δy)²','コーラブル債には負のコンベクシティが現れることがある。',[
+    ['Modified duration is 4 and convexity is 30. For a +1% yield change, the approximate price change is:', ['−4.15%','−3.85%','+4.15%'],1,['コンベクシティ項はこの式ではプラスです。','−4×0.01+0.5×30×0.01²=−0.0385です。','価格一次効果の符号が逆です。'],'convexity','コンベクシティ'],
+    ['Sensitivity to a change at a specific maturity point on the yield curve is measured most directly by:', ['Current yield','Dividend yield','Key rate duration'],2,['利息収入と価格の比率です。','株式配当の比率です。','特定年限の金利変化への感応度を測ります。'],'key rate duration','キーレート・デュレーション']
+  ],src),
+  u('fixed','credit','信用リスク・損失・格付け',['デフォルト確率と損失率を区別する','財務指標・順位を信用分析へ使う'],['信用リスクには不履行だけでなく格下げやスプレッド拡大もある。格付けは意見であり、価格や安全性の保証ではない。','期待信用損失はPD×LGD×EADで近似する。回収率が高いほど損失率は低いが、回収時点や担保価値の変動も重要。','企業では営業CF、利払能力、レバレッジ、担保・優先順位・コベナンツを検討する。国では財政、対外債務、制度、通貨発行能力などを考える。'],'期待損失 ≈ PD × (1−回収率) × エクスポージャー','格付けが同じでも満期・通貨・流動性でスプレッドは異なり得る。',[
+    ['Default probability is 2%, recovery is 40%, and exposure is 1,000. Expected loss is:', ['8','12','20'],1,['回収率ではなく損失率60%を使います。','0.02×0.60×1,000=12です。','回収を無視しています。'],'loss given default','デフォルト時損失率'],
+    ['Which claim generally has the highest priority in a liquidation, subject to legal specifics?', ['Common equity','Subordinated unsecured debt','Senior secured debt'],2,['普通株は残余請求権です。','劣後債は優先債に劣後します。','通常、担保と優先順位により回収上の優位があります。'],'seniority','弁済順位']
+  ],src),
+  u('fixed','securitization','証券化・ABS・MBS',['プールとトランシェの仕組みを理解する','期限前返済リスクを区別する'],['証券化は資産プールのCFを裏付けに証券を発行し、信用補完やトランシェで損失・元本の配分を変える。SPVの倒産隔離は法的構造の確認が必要。','劣後トランシェが先に損失を負担し、超過担保や準備金が信用補完になり得る。リスクは消滅するのではなく配分される。','MBSでは返済加速によるコン トラクション・リスクと、返済減速によるエクステンション・リスクがある。金利低下時に借換えが増えやすい。'],'','平均残存期間が一定と仮定してMBSを通常債と同じに扱わない。',[
+    ['In a simple senior/subordinated securitization, initial credit losses are generally absorbed first by:', ['The subordinated tranche','The senior tranche only','All tranches necessarily equally'],0,['劣後トランシェが先に損失を負担する構造です。','シニアには劣後部分の信用補完があります。','損失配分は優先順位により異なります。'],'credit enhancement','信用補完'],
+    ['Mortgage prepayments slow after rates rise. MBS investors are most directly exposed to:', ['Contraction risk','Extension risk','A guaranteed shorter life'],1,['返済加速で期間が短くなる場合です。','返済が遅れ、予想より元本回収が延びるリスクです。','期間は通常延びる方向です。'],'extension risk','エクステンション・リスク']
+  ],src),
+  u('derivatives','markets','デリバティブ市場・裁定・複製',['契約の義務と権利を比較する','無裁定の基本を理解する'],['先渡し型のフォワード・先物・スワップは将来交換の義務を伴い、オプションの買い手には選択権がある。いずれも想定元本と現在の価値は異なる。','取引所は標準化と清算、店頭は個別設計が特徴だが、店頭でも中央清算される場合がある。担保・清算でリスクは減ってもゼロにはならない。','同じ将来CFを持つポートフォリオは、摩擦のない市場では同じ価格となる。複製の価格差は裁定の機会になり得る。'],'','想定元本が、そのまま投資額・損失限度・信用エクスポージャーになるわけではない。',[
+    ['Which contract gives the buyer a right but not an obligation to exercise?', ['A forward','An option','A standard futures contract'],1,['通常将来交換の義務があります。','買い手は権利を行使しない選択ができます。','通常契約上の義務があります。'],'contingent claim','条件付き請求権'],
+    ['In frictionless markets, two portfolios with identical future payoffs should have:', ['Identical current prices','Arbitrary unrelated prices','Identical notional amounts only'],0,['一物一価により価格が一致しないと裁定が可能です。','同じCFなのに価格が異なると裁定余地が生じます。','重要なのは元本表示ではなく、CFとリスクです。'],'law of one price','一物一価の法則']
+  ],src),
+  u('derivatives','forwards','フォワードの価格・価値・保有費用',['契約価格と途中の時価を分ける','保有費用と収益を反映する'],['配当などがなく摩擦のない資産の受渡価格は、スポットに期間の資金調達費用を反映する。保管費用は上乗せ、保有収益は控除の方向。','契約開始時の価値がゼロになる価格を定めても、スポットや金利が動けば契約の時価は変化する。','一定金利・収益なしの単純ケースでは、買い手価値は現在スポットと既存受渡価格の割引額の差。途中の時価と満期ペイオフは区別する。'],'F₀ = S₀(1+r)^T；買い手価値 Vt = St − K/(1+r)^(T−t) （収益なし）','式は配当・保管費用・借入制限などの前提に依存する。',[
+    ['A non-dividend asset is priced at 100. With a 5% one-year risk-free rate, the fair one-year forward price is:', ['95','100','105'],2,['保有の資金調達費用は上乗せします。','正の金利を反映していません。','100×1.05=105です。'],'cost of carry','保有費用'],
+    ['A long forward has delivery price 100, one year remaining, spot 110, and a 10% risk-free rate. With no income, its value is closest to:', ['10.00','19.09','21.00'],1,['途中時価では受渡価格を割り引きます。','110−100/1.10≈19.09です。','現在価値の式とは一致しません。'],'forward value','フォワードの時価']
+  ],src),
+  u('derivatives','futures','先物・証拠金・日次決済',['日々の損益を計算する','証拠金と最終利益を区別する'],['先物の値洗いは日々の価格差を損益として証拠金勘定に反映する。開始証拠金は売買代金やオプション料ではなく履行担保。','維持証拠金を下回れば追加拠出が必要になり得る。経済的ヘッジが有効でも短期の資金繰り負担は残る。','フォワードと先物は決済時点が違い、金利が確率的で原資産価格と関連する場合などには価格差が生じ得る。'],'買い先物の日次損益 = (当日決済価格 − 前日決済価格) × 契約乗数 × 契約数','日次決済益と証拠金の出し入れを二重に利益計上しない。',[
+    ['One long futures contract has a multiplier of 10. Settlement rises from 100 to 103. Daily gain is:', ['3','10','30'],2,['契約乗数10が抜けています。','価格差3も反映します。','(103−100)×10=30です。'],'marking to market','値洗い'],
+    ['Initial margin on a futures contract is primarily:', ['A performance guarantee','A premium paid to own an option','The full purchase price of the underlying'],0,['契約履行を担保する証拠金です。','オプション料とは異なります。','通常原資産全額の支払いではありません。'],'initial margin','当初証拠金']
+  ],src),
+  u('derivatives','swaps','スワップ・交換キャッシュフロー',['固定・変動の支払いを計算する','スワップ開始時と途中価値を区別する'],['同一通貨の金利スワップでは、想定元本を通常交換せず、金利差の支払をネットする。通貨スワップでは元本交換を伴う構造もある。','固定金利は契約開始時に固定側と変動側の現在価値が等しくなるよう定めるのが基本。市場金利の変化で時価は変わる。','固定支払側は一般に金利上昇時に価値が上がりやすい。ただし金利曲線、支払日、参照金利、ベーシスに依存する。'],'固定支払・変動受取の純受取 = 元本 × (変動率 − 固定率) × 期間割合','年率を支払期間で調整し、受取と支払の方向を明記する。',[
+    ['A pay-fixed swap has notional 1,000,000, fixed rate 4%, floating rate 5%, and accrual factor 0.5. Net receipt is:', ['5,000','10,000','−5,000'],0,['1,000,000×(0.05−0.04)×0.5=5,000です。','半年の期間割合0.5が抜けています。','変動受取が固定支払より大きいので正です。'],'swap net settlement','スワップの差額決済'],
+    ['In a standard same-currency interest-rate swap, the notional principal is usually:', ['Exchanged every day','Used to calculate interest rather than exchanged','Equal to the option premium'],1,['通常元本自体は交換しません。','利息計算の基準額として使います。','オプション料とは別の概念です。'],'notional principal','想定元本']
+  ],src),
+  u('derivatives','option-values','オプション価値・要因・上下限',['本源価値と時間価値を分ける','価格要因と行使方式を整理する'],['本源価値は即時行使による価値、時間価値はオプション価格から本源価値を引く。ヨーロピアンは満期だけ、アメリカンは満期以前にも行使できる。','他条件一定で原資産上昇はコールに有利、プットに不利。ボラティリティ上昇は通常どちらの買い手にも有利。','非配当資産のヨーロピアン・コールにはmax(S−PV(K),0)という下限がある。行使制約、配当、金利で価格関係を変える。'],'コール本源価値 = max(S−K,0)；プット本源価値 = max(K−S,0)','オプション価格、本源価値、買い手の利益は別の数字。',[
+    ['A call is priced at 9 with stock price 55 and strike 50. Its time value is:', ['4','5','9'],0,['本源価値5を価格9から引くと4です。','5は本源価値です。','価格全額が時間価値ではありません。'],'time value','時間価値'],
+    ['All else equal, higher underlying volatility generally increases the value of:', ['Calls only','Puts only','Both calls and puts'],2,['コールだけに限りません。','プットだけに限りません。','買い手は不利な場合に行使せず、有利な大きな変動の恩恵を受けます。'],'option volatility','オプションと変動性']
+  ],src),
+  u('derivatives','parity','プット・コール・パリティ',['同じ満期CFを複製する','価格関係の前提を確認する'],['非配当資産の同一行使価格・満期のヨーロピアンでは、コールと無リスク債の組合せはプットと現物の組合せと同じ満期CFを持つ。','式を変形して欠けた価格や合成ポジションを求める。配当があれば配当現在価値を調整する。','同じ満期・行使価格・原資産・行使方式を揃える。アメリカンの早期行使権がある場合は、等式をそのまま適用できないことがある。'],'C + PV(K) = P + S （非配当、ヨーロピアン）','現金額Kを現在時点のまま足さず、現在価値へ割り引く。',[
+    ['For non-dividend European options, C = 8, P = 3, and PV(K) = 95. Spot S equals:', ['90','100','106'],1,['等式の移項方向が逆です。','S=C+PV(K)−P=8+95−3=100です。','CとPを両方足すのではありません。'],'put-call parity','プット・コール・パリティ'],
+    ['Put-call parity in its basic equality requires options with:', ['Different maturities','The same strike and maturity','Any arbitrary underlying assets'],1,['満期を一致させます。','同一原資産・行使価格・満期・適切な方式が必要です。','原資産も同一にする必要があります。'],'synthetic position','合成ポジション']
+  ],src),
+  u('derivatives','binomial','一期間二項モデル・リスク中立',['複製比率を計算する','リスク中立確率で価値を求める'],['二項モデルは期間末の上昇・下落の2状態を設定する。デルタは両状態のオプション価値差を原資産価格差で割る。','裁定のないリスク中立確率を使い、期待ペイオフを無リスク金利で割り引く。これは現実の上昇確率の推定ではない。','1+rが下落倍率と上昇倍率の間にあるなど無裁定条件を確認する。配当や期間の扱いはモデルに合わせる。'],'p* = (1+r−d)/(u−d)；C = [p*Cu + (1−p*)Cd]/(1+r)','リスク中立確率と投資家のリスク選好を直接同一視しない。',[
+    ['In a one-period model, u = 1.2, d = 0.8, and r = 0. The risk-neutral up probability is:', ['0.2','0.5','0.8'],1,['(1−0.8)/(1.2−0.8)を計算します。','0.2/0.4=0.5です。','下落倍率を確率にするのではありません。'],'risk-neutral probability','リスク中立確率'],
+    ['A call pays 20 in the up state and 0 in the down state. Risk-neutral up probability is 0.5 and r = 0. Its price is:', ['0','10','20'],1,['上昇時の価値を無視しています。','0.5×20+0.5×0=10です。','上昇状態だけを確実と見なしてはいけません。'],'binomial valuation','二項評価']
+  ],src),
+  u('derivatives','hedging','ヘッジ・ベーシス・信用保護',['買い・売りヘッジを選ぶ','ヘッジ後に残るリスクを考える'],['将来売却する資産の価格下落を避けるには売りヘッジ、将来購入する資産の値上がりを避けるには買いヘッジを考える。','現物と先物が完全には連動せず、資産や期限の差によるベーシス・リスクが残る。ヘッジは機会利益を放棄したり資金繰り負担を生む。','CDSの保護買い手はプレミアムを払い、信用事由に備える。カウンターパーティ、契約上の信用事由、回収率、ベーシスを確認する。'],'ベーシス = 現物価格 − 先物価格（本教材の定義）','ヘッジはあらゆるリスクの除去や無損失を保証しない。',[
+    ['A wheat producer wants protection against a fall in the sale price of future output. It would generally:', ['Buy wheat futures','Sell wheat futures','Buy more unhedged wheat inventory'],1,['買いヘッジは価格上昇への備えです。','売り先物の利益で現物価格下落を相殺する方向です。','価格下落へのエクスポージャーを増やします。'],'short hedge','売りヘッジ'],
+    ['The buyer of CDS protection generally:', ['Receives regular premiums to insure the seller','Pays premiums for protection against defined credit events','Eliminates every counterparty risk'],1,['保護売り手がプレミアムを受け取ります。','信用事由の際の契約上の支払いに備えて対価を払います。','相手先が履行できないリスクなどは残ります。'],'credit default swap','クレジット・デフォルト・スワップ']
+  ],src),
+  u('alternative','structures','投資形態・ファンド・報酬契約',['直接投資とファンドを比較する','報酬条件を読み解く'],['直接投資は資産選定・運営に関与できる一方、資金と専門知識が必要。ファンド投資は運営を委ねるが、報酬やコントロールの制約がある。','LPは投資家、GPは運営者という構造が典型。出資約束と実際の払込を区別し、償還制約・ロックアップ・ゲートも確認する。','管理報酬の基準はコミットメントや投下資本、純資産など契約により違う。成功報酬はハードル、キャッチアップ、ハイウォーターマーク、クローバックで変わる。'],'','「2/20」という表示だけで実際の報酬額を決めない。',[
+    ['A clawback provision generally aims to:', ['Allow recovery of excess incentive compensation under the agreement','Guarantee every investment gains value','Remove all management fees'],0,['最終的な配分などに照らし過大報酬の返還を求める仕組みです。','投資利益を保証しません。','管理報酬の全廃とは異なります。'],'clawback','クローバック'],
+    ['A redemption gate primarily limits:', ['The amount investors can redeem in a period','The number of assets the fund can purchase','The size of government taxes'],0,['一定期間の償還量を制限します。','通常はファンドの購入件数制限ではありません。','税制ではなく償還条件です。'],'redemption gate','償還制限']
+  ],src),
+  u('alternative','performance','成果測定・倍率・評価バイアス',['IRRと投資倍率を比較する','評価の平滑化と標本の偏りを理解する'],['IRRは入出金時点の影響を受け、倍率は通常時間価値を示さない。両方とCFのタイミングを併用し、戦略ごとのベンチマークを選ぶ。','TVPIは累計分配と残存価値を払込額で割り、DPIは実際の分配だけを払込額で割る。残存価値は未実現で推定の不確実性を含む。','鑑定価格の平滑化は見かけの変動性や相関を低める可能性。生存者・バックフィル・選択バイアスはデータベースの実績を良く見せ得る。'],'TVPI = (累計分配 + 残存価値) / 累計払込；DPI = 累計分配 / 累計払込','自己申告データや古い評価額を市場価格と同一視しない。',[
+    ['Paid-in capital is 100, distributions are 40, and residual value is 90. TVPI equals:', ['0.4','0.9','1.3'],2,['DPIの値です。','分配を含めていません。','(40+90)/100=1.3です。'],'total value to paid-in','投下資本総価値倍率'],
+    ['Excluding failed funds from a return database most directly creates:', ['Survivorship bias','No measurement bias','A lower reported average return necessarily'],0,['残ったファンドだけで評価する生存者バイアスです。','失敗したファンドの欠落は偏りを生みます。','一般に平均を良く見せる方向の偏りです。'],'survivorship bias','生存者バイアス']
+  ],src),
+  u('alternative','private-equity','PE・VC・バイアウト',['成長段階と投資手法を比較する','Jカーブと退出を理解する'],['VCは初期段階などの成長企業、バイアウトは成熟企業の支配権取得を対象にすることが多い。レバレッジはリターンと破綻リスクの両方を高め得る。','初期は投資・手数料が先行し、評価や回収が後になるJカーブが現れ得る。すべてのファンドに同じ形が保証されるわけではない。','退出にはIPO、戦略買収、他のファンドへの売却などがある。CF、負債返済、利益成長、出口倍率で価値創造を分けて考える。'],'','倍率上昇に依存した価値創造と事業改善を混同しない。',[
+    ['Venture capital most typically targets:', ['Early-stage high-growth companies','Only central government bills','Only stabilized toll roads'],0,['初期段階などの高成長企業が主な対象です。','短期国債はVCの典型ではありません。','安定インフラだけを投資対象にしません。'],'venture capital','ベンチャーキャピタル'],
+    ['The private equity J-curve most directly reflects:', ['Guaranteed early positive returns','Early costs followed by potential later realizations','A fixed interest-payment schedule'],1,['初期に費用や投資が先行することがあります。','初期の負担と後期の回収が時間的にずれる現象です。','債券の固定利払いではありません。'],'J-curve','Jカーブ']
+  ],src),
+  u('alternative','private-debt','プライベートデット・ディストレスト',['非公開融資の特徴を理解する','優先順位と信用分析を結ぶ'],['プライベートデットは相対融資など非公開の債務投資。変動金利、財務コベナンツ、担保などを個別交渉できることがある。','流動性や評価の透明性が低く、借手集中・レバレッジ・契約条件も重要。高い表面利回りだけで割安と判断しない。','メザニンは優先債務より劣後し、株式連動の権利を持つ場合がある。ディストレストでは再建・回収・法的順位の分析が中心になる。'],'','担保・変動金利があっても信用損失は残る。',[
+    ['Compared with senior secured debt, mezzanine debt is generally:', ['More senior','Subordinated and potentially higher yielding','Guaranteed by every government'],1,['優先順位は通常低い側です。','劣後性に見合う高い利回りなどを求めます。','政府保証が自動的に付くわけではありません。'],'mezzanine debt','メザニン債務'],
+    ['A floating-rate private loan protects the lender mainly from all else equal:', ['Every default loss','Every liquidity shortfall','Some exposure to rising benchmark rates'],2,['信用損失は残ります。','流動性リスクは残ります。','基準金利に応じ利息が更新されるため、一部の金利上昇影響を抑えます。'],'private credit','プライベートクレジット']
+  ],src),
+  u('alternative','real-estate','不動産・REIT・評価',['収益と利回りで価値を考える','物件特性と保有形態を比較する'],['不動産のNOIは賃料などから運営費を引いたもので、通常借入利息や会計上の減価償却前。空室、維持費、賃料改定が価値に効く。','直接還元は安定NOI/還元利回り。DCFは期間別CFと出口価値を割り引く。還元利回り上昇は同じNOIなら価値を下げる。','REITなどの上場ビークルは取引しやすいが価格変動や株式市場との連動を持つ。直接物件投資の流動性と同じではない。'],'価値 = 安定NOI / 還元利回り','還元利回りと借入金利、物件NOIと株主CFを区別する。',[
+    ['Holding NOI constant, an increase in the capitalization rate causes indicated property value to:', ['Increase','Decrease','Remain unchanged'],1,['分母が上がるので価値は下がります。','NOI/還元利回りの分母が上がります。','利回りは評価額に影響します。'],'direct capitalization','直接還元法'],
+    ['Property NOI is 60 and capitalization rate is 6%. Indicated value is:', ['360','1,000','10'],1,['60×6ではありません。','60/0.06=1,000です。','利回りを百分率のまま6で割ってはいけません。'],'net operating income','純営業収益']
+  ],src),
+  u('alternative','infrastructure','インフラ・事業段階・契約',['新設と既存資産のリスクを比較する','収入源と規制を把握する'],['グリーンフィールドは新設段階で建設・許認可・需要立上げリスクが大きい。ブラウンフィールドは既存運営資産で、過去の利用実績を確認しやすい。','収入は利用量依存の通行料、規制料金、利用可能性に基づく契約などさまざま。インフレ連動は契約や規制に依存する。','長期CFは金利に敏感になり得る。政府・規制・相手先・技術変化・維持更新費用のリスクも検討する。'],'','「インフラだから安定」「必ずインフレヘッジ」とは限らない。',[
+    ['A project building a new airport before operations begin is typically:', ['Brownfield','Greenfield','A liquid Treasury bill'],1,['ブラウンフィールドは既存運営資産です。','建設段階の新規事業はグリーンフィールドです。','現物インフラ事業です。'],'greenfield investment','新設インフラ投資'],
+    ['Revenue from a toll road charged per vehicle is most directly exposed to:', ['Traffic-volume risk','No demand risk','Guaranteed constant usage'],0,['通行台数が収入に直接影響します。','利用量依存なら需要リスクがあります。','利用台数は保証されません。'],'demand risk','需要リスク']
+  ],src),
+  u('alternative','commodities','商品・先物・ロール収益',['現物と先物投資を区別する','カーブ形状と収益要因を整理する'],['商品自体は通常利息や配当を生まないが、需給、保管費用、利便性、インフレに影響される。現物保有と担保付き先物投資では収益構成が異なる。','コンタンゴは遠い限月の価格が高い形、バックワーデーションは低い形。カーブ形状は将来のスポット変化を保証しない。','先物の総収益はスポット変化、ロール、担保収益などに分けて考える。ロール影響は取引・カーブ変化・定義に依存する。'],'','コモディティ指数の成績を、現物価格の変化だけで説明しない。',[
+    ['A futures curve with higher prices for more distant maturities is called:', ['Backwardation','Contango','A zero-coupon curve by definition'],1,['遠い限月が安い形です。','遠い限月が高い形はコンタンゴです。','債券のゼロクーポン曲線ではありません。'],'contango','コンタンゴ'],
+    ['A fully collateralized commodity futures strategy can earn return from:', ['Only cash dividends paid by physical oil','Futures price changes and collateral interest','Only physical warehouse rent'],1,['原油現物は通常配当を払いません。','先物損益と担保資金の収益などで構成されます。','保管費用だけが収益要素ではありません。'],'collateral return','担保収益']
+  ],src),
+  u('alternative','hedge-digital','ヘッジファンド・デジタル資産',['戦略ごとのリスクを比較する','デジタル資産の保管と評価を考える'],['株式ロングショート、イベントドリブン、相対価値、マクロは異なるリスク源を持つ。「ヘッジファンド」という名称だけで市場中立や低リスクを意味しない。','レバレッジ、ショート、償還制限、評価の裁量、運用者集中を検討する。相対価値戦略も流動性悪化やスプレッド拡大で損失を負う。','デジタル資産は秘密鍵の管理、ネットワーク、取引所・カストディ、規制、価格形成に固有のリスクがある。トークン種類により権利も異なる。'],'','名称や過去相関だけで安全性や将来の分散効果を保証しない。',[
+    ['A hedge fund holding both long and short stocks is necessarily:', ['Free of market risk','Guaranteed to earn positive alpha','Still exposed to risk depending on positions'],2,['ネット・グロス構成や相関で市場感応度は残り得ます。','アルファは保証されません。','戦略名だけでは実際のリスクは分かりません。'],'long-short equity','株式ロングショート'],
+    ['Loss of access to the private key of a self-custodied digital asset primarily illustrates:', ['A guaranteed inflation hedge','Custody and operational risk','A bond coupon reset'],1,['インフレとの関係ではありません。','アクセス管理や保管の運用リスクです。','債券の金利更新とは別です。'],'private key custody','秘密鍵の保管']
+  ],src)
+];
