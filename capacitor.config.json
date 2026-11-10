@@ -1,0 +1,14 @@
+{
+  "appId": "jp.cfapocket.study",
+  "appName": "CFA Pocket",
+  "webDir": "www",
+  "loggingBehavior": "debug",
+  "android": {
+    "allowMixedContent": false,
+    "minWebViewVersion": 100,
+    "backgroundColor": "#f7f8f3"
+  },
+  "plugins": {
+    "SystemBars": { "style": "LIGHT", "insetsHandling": "css" }
+  }
+}

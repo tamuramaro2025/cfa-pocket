@@ -9,3 +9,10 @@
 .pwa-indicators{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:#537740;margin:14px 0}.mobile-install .notice{margin:15px 0}.mobile-install>p{font-size:13px}.backup-import{border-top:1px solid var(--border);padding-top:20px;margin-top:20px}.backup-import>label{font-size:12px;font-weight:600}.backup-import input{margin:10px 0;font-size:13px}.backup-import>.secondary{margin-top:10px}.pwa-toast{position:fixed;bottom:20px;left:calc(50% + 100px);transform:translateX(-50%);z-index:40;max-width:90vw;background:#174b3c;color:white;box-shadow:0 4px 18px #0002;border-radius:10px;padding:11px 17px;font-size:12px;text-align:center}.topbar{padding-top:env(safe-area-inset-top)}
 @media(max-width:600px){input,select{font-size:16px}.mobile-nav{padding-left:max(5px,env(safe-area-inset-left));padding-right:max(5px,env(safe-area-inset-right))}.pwa-toast{left:50%;bottom:calc(80px + env(safe-area-inset-bottom));width:max-content;font-size:11px;max-width:90vw}.option,.confidence-buttons button{min-height:48px}.workspace{min-height:100dvh}.mobile-install .lesson-actions{align-items:stretch}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.native-app{--app-top:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px));--app-bottom:max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px))}
+.native-app body{padding-top:var(--app-top);padding-left:max(env(safe-area-inset-left,0px),var(--safe-area-inset-left,0px));padding-right:max(env(safe-area-inset-right,0px),var(--safe-area-inset-right,0px))}
+.native-app .topbar{padding-top:0}.native-app .mobile-nav{padding-bottom:var(--app-bottom);height:calc(68px + var(--app-bottom))}
+.native-app .workspace{padding-bottom:var(--app-bottom)}
+.native-app input,.native-app select,.native-app textarea{scroll-margin-block:100px}
+.keyboard-open .mobile-nav{display:none}.keyboard-open .pwa-toast{display:none}
+@media(max-width:600px){.native-app main{padding-bottom:calc(90px + var(--app-bottom))}.native-app .pwa-toast{bottom:calc(80px + var(--app-bottom))}.question-text,.option>span,.review-row>div{overflow-wrap:anywhere}.week-grid{min-width:0}}

@@ -3,6 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node server.mjs", "test": "node --test", "build": "node scripts/build-mobile.mjs" },
-  "engines": { "node": ">=22" }
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "build": "node scripts/build-mobile.mjs",
+    "build:android-web": "node scripts/build-android-web.mjs",
+    "android:sync": "npm run build:android-web && cap sync android",
+    "android:debug": "npm run android:sync && node scripts/android-debug.mjs",
+    "android:open": "cap open android"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/keyboard": "8.0.6",
+    "@capacitor/preferences": "8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "esbuild": "0.28.2"
+  }
 }

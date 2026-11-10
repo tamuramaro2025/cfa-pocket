@@ -31,6 +31,7 @@ async function checkOfflineReady(){
   catch{state.offlineReady=false;}
 }
 export async function initPwa(){
+  if(window.CFA_NATIVE){state.standalone=true;state.offlineReady=true;state.persistent=true;emit();return;}
   try{state.persistent=await navigator.storage?.persisted?.()||false;}catch{/*optional*/}
   if(!state.secure||!('serviceWorker'in navigator)){emit();return;}
   navigator.serviceWorker.addEventListener('controllerchange',async()=>{if(reloadRequested){location.reload();return;}await checkOfflineReady();emit();});
@@ -46,6 +47,7 @@ export async function initPwa(){
   emit();
 }
 export function pwaPanel(esc,studyActive=false){
+  if(window.CFA_NATIVE)return `<section class="card mobile-install"><h2>Android版 CFA Pocket</h2><p>✓ 教材はアプリ内に収録済み。通信なしで学習できます。</p><p class="subtitle">記録はAndroidのアプリ専用領域に保存されます。理解度を選ぶと回答・正答率・復習予定を記録します。アプリの削除・データ消去で記録が失われるため、定期的にバックアップしてください。Macのブラウザとは自動同期しません。</p></section>`;
   return `<section class="card mobile-install"><h2>Androidアプリとして使う</h2><p>${state.standalone?'✓ アプリモードで利用中':'Chromeからホーム画面に追加すると、アプリのように開けます。'}</p>
     ${!state.secure?'<div class="notice">この接続ではインストール・オフライン保存を利用できません。スマホではHTTPSの配信URLを開いてください。</div>':''}
     <div class="pwa-indicators"><span>${state.online?'● オンライン':'○ オフライン'}</span><span>${state.offlineReady?'✓ 教材を端末に保存済み':'教材のオフライン保存を確認中'}</span></div>

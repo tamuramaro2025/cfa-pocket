@@ -5,15 +5,20 @@ import { auditView } from './los-audit.js';
 import { initPwa, pwaState, onPwaChange, pwaPanel, installApp, applyUpdate, protectStorage } from './pwa.js';
 import { validateBackup } from './backup.js';
 import { dayKey, addDays, dueQuestions, makeQueue, schedule, streak } from './engine.js';
+import { createStudyStorage } from './storage.js';
+import { backDestination, installKeyboardLayout } from './android-navigation.js';
 
-const KEY = 'cfa-pocket-v1';
 const empty = () => ({ progress: {}, history: [], bookmarks: [], readUnits: [], exam: '', goal: 3 });
 let state = empty();
 let warning = '';
-try {
-  const saved = JSON.parse(localStorage.getItem(KEY));
-  if (saved && saved.progress && Array.isArray(saved.history) && Array.isArray(saved.bookmarks)) state = { ...empty(), ...saved };
-} catch { warning = '保存データを読み込めませんでした。この画面では新しい記録で開始します。'; }
+let saving = false;
+let loadFailed = false;
+const native = window.CFA_NATIVE;
+const storage = createStudyStorage({
+  local: { getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) },
+  preferences: native?.preferences,
+  onError: () => { warning = '記録を保存できませんでした。アプリを閉じる前にバックアップしてください。'; }
+});
 let page = 'home';
 let session = null;
 let guideTopic = 'all';
@@ -24,9 +29,9 @@ const validPage = value => ['home','topics','curriculum','coverage','review','st
 const app = document.querySelector('#app');
 const esc = value => String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
 const topicOf = q => topics.find(t => t.id === q.topic);
-const saved = () => {
-  try { localStorage.setItem(KEY, JSON.stringify(state)); }
-  catch { warning = 'ブラウザの保存領域が利用できません。記録はこの画面を閉じると失われます。'; }
+const saved = async () => {
+  if (loadFailed) { warning = '元の保存データを保護するため書き込みを停止しています。データを削除せずアプリを開き直してください。'; return false; }
+  return storage.save(state);
 };
 const todayCount = () => state.history.filter(h => h.day === dayKey()).length;
 const due = () => dueQuestions(questions, state.progress);
@@ -90,7 +95,8 @@ function result() {
   const correct = session.results.filter(r => r.correct).length;
   return `${heading('A SMALL STEP, WELL DONE','今日の一歩、おつかれさま。')}<section class="card result-card"><span class="result-icon">✦</span><h2>またひとつ、前に進みました。</h2><p class="subtitle">${session.results.length}問の学習を記録しました。</p><div class="result-score">${correct}<span> / ${session.results.length}問正解</span></div><p>次の復習は、それぞれの理解度に合わせて。</p>${session.results.map(r => { const q = questions.find(q => q.id === r.id); return `<div class="review-row"><span class="result-dot ${r.correct ? 'yes' : ''}">${r.correct ? '✓' : '↻'}</span><div><strong>${esc(q.term)}</strong><small>次の復習：${esc(r.due)}</small></div></div>`; }).join('')}<div class="result-actions"><a class="primary" href="#home">ホームに戻る</a>${session.unit ? button('この単元を続ける','continue-unit','secondary') : button('もう3問学ぶ','start','secondary')}</div></section>`;
 }
-app.addEventListener('click', event => {
+app.addEventListener('click', async event => {
+  if (saving) return;
   const link = event.target.closest('a[href^="#"]');
   if (link) {
     event.preventDefault();
@@ -106,14 +112,14 @@ app.addEventListener('click', event => {
   if(action==='pwa-persist') return void protectStorage();
   if(action==='pwa-update') { if(page==='study') return; return applyUpdate(); }
   if(action==='import-cancel'){pendingImport=null;importMessage='';}
-  if(action==='import-confirm'&&pendingImport){state=pendingImport.state;session=null;pendingImport=null;importMessage='✓ バックアップを読み込みました。';saved();}
+  if(action==='import-confirm'&&pendingImport){state=pendingImport.state;session=null;pendingImport=null;importMessage='✓ バックアップを読み込みました。';await saved();}
   if (action === 'audit-question') return start('daily', 'all', null, el.dataset.id);
   if (action === 'continue-unit') return start('daily', 'all', session?.unit);
   if (action === 'unit-study') return start('daily', 'all', el.dataset.unit);
   if (action === 'read-unit' && units.some(u => u.id === el.dataset.unit)) {
     const id = el.dataset.unit;
     const read = state.readUnits || [];
-    state.readUnits = read.includes(id) ? read.filter(x => x !== id) : [...read, id]; saved();
+    state.readUnits = read.includes(id) ? read.filter(x => x !== id) : [...read, id]; await saved();
   }
   if (action === 'start') return start();
   if (action === 'review-start') return start('review');
@@ -125,32 +131,41 @@ app.addEventListener('click', event => {
     session = null; page = 'home';
   }
   if (action === 'finish' && session?.checked) {
+    saving = true;
+    document.querySelectorAll('[data-action="finish"]').forEach(button => { button.disabled = true; });
     const id = session.ids[session.index];
     const q = questions.find(q => q.id === id);
     const correct = session.choice === q.answer;
     state.progress[id] = schedule(state.progress[id], correct, el.dataset.confidence);
     state.history.push({ id, correct, confidence: el.dataset.confidence, day: dayKey(), at: new Date().toISOString() });
-    session.results.push({ id, correct, due: state.progress[id].due }); saved();
+    session.results.push({ id, correct, due: state.progress[id].due }); await saved();
+    saving = false;
     if (session.index + 1 >= session.ids.length) page = 'result';
     else { session.index++; session.choice = null; session.checked = false; }
     window.scrollTo(0,0);
   }
   if (action === 'bookmark') {
     const id = el.dataset.id;
-    state.bookmarks = state.bookmarks.includes(id) ? state.bookmarks.filter(x => x !== id) : [...state.bookmarks, id]; saved();
+    state.bookmarks = state.bookmarks.includes(id) ? state.bookmarks.filter(x => x !== id) : [...state.bookmarks, id]; await saved();
   }
   if (action === 'export') {
+    if (native) {
+      try { await native.backup.save({ filename: `cfa-pocket-${dayKey()}.json`, content: JSON.stringify({ version: 1, ...state }, null, 2) }); }
+      catch { warning = 'バックアップを保存できませんでした。保存先を選んで再度お試しください。'; render(); }
+      return;
+    }
     const url = URL.createObjectURL(new Blob([JSON.stringify({ version: 1, ...state }, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = `cfa-pocket-${dayKey()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url),1000); return;
   }
   if (action === 'reset') {
     if (!confirm('このブラウザの学習記録をすべて削除します。この操作は元に戻せません。削除しますか？')) return;
-    state = empty(); session = null; saved();
+    state = empty(); session = null; await saved();
   }
   render();
   if (action === 'check') document.querySelector('.answer-feedback')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
-app.addEventListener('submit', event => {
+app.addEventListener('submit', async event => {
+  if (saving) { event.preventDefault(); return; }
   if (event.target.id === 'guide-search') {
     event.preventDefault(); const data = new FormData(event.target);
     guideTopic = String(data.get('topic')); guideQuery = String(data.get('query') || '').trim(); render(); return;
@@ -158,7 +173,7 @@ app.addEventListener('submit', event => {
   if (event.target.id !== 'settings-form') return;
   event.preventDefault(); const data = new FormData(event.target);
   state.goal = [3,6,9].includes(Number(data.get('goal'))) ? Number(data.get('goal')) : 3;
-  state.exam = String(data.get('exam') || ''); saved(); render();
+  state.exam = String(data.get('exam') || ''); await saved(); render();
   document.querySelector('#settings-status').textContent = warning || '✓ 設定を保存しました。';
 });
 app.addEventListener('change', async event=>{
@@ -175,5 +190,32 @@ app.addEventListener('change', async event=>{
 window.addEventListener('hashchange', () => { page = location.hash.slice(1) || 'home'; if (!validPage(page)) page = 'home'; render(); window.scrollTo(0,0); });
 page = validPage(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
 onPwaChange(refreshPwaUi);
-render();
-void initPwa();
+async function boot() {
+  try {
+    const record = await storage.load();
+    if (record !== null) {
+      if (!record?.progress || !Array.isArray(record.history) || !Array.isArray(record.bookmarks)) throw new Error('Invalid stored state');
+      state = { ...empty(), ...record };
+    }
+  } catch {
+    loadFailed = true;
+    warning = '保存データを読み込めませんでした。元データを保護するため書き込みは停止しています。データを削除せず開き直してください。';
+  }
+  render();
+  installKeyboardLayout(window, document);
+  if (native) {
+    await native.app.addListener('backButton', async () => {
+      if (saving) return;
+      const active = document.activeElement;
+      if (document.documentElement.classList.contains('keyboard-open')) { active?.blur(); await native.keyboard.hide(); return; }
+      if (page === 'study' && !confirm('学習を終了しますか？ 理解度を選んで記録した回答は保存されています。')) return;
+      const target = backDestination(page, session?.unit);
+      await storage.flush();
+      if (!target) { await native.app.minimizeApp(); return; }
+      session = null; page = target; location.hash = target; render(); window.scrollTo(0, 0);
+    });
+    await native.app.addListener('appStateChange', ({ isActive }) => { if (!isActive) void storage.flush(); });
+  }
+  void initPwa();
+}
+void boot();

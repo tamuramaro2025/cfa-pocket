@@ -1,2 +1,11 @@
 .local/
 .DS_Store
+node_modules/
+www/
+mobile-site/dist/
+mobile-site/.git/
+android/.gradle/
+android/**/build/
+android/local.properties
+*.jks
+*.keystore
