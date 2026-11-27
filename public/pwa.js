@@ -36,7 +36,7 @@ export async function initPwa(){
   if(!state.secure||!('serviceWorker'in navigator)){emit();return;}
   navigator.serviceWorker.addEventListener('controllerchange',async()=>{if(reloadRequested){location.reload();return;}await checkOfflineReady();emit();});
   try{
-    registration=await navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'});
+    registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
     state.updateReady=Boolean(registration.waiting);
     registration.addEventListener('updatefound',()=>{
       const worker=registration.installing;

@@ -1,0 +1,22 @@
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import path from 'node:path';
+import { buildPublishing } from './publishing.mjs';
+import { iconSvg } from './icon-artwork.mjs';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+await buildPublishing();
+const work = path.join(root, '.local/store-artwork');
+const out = path.join(root, 'dist/google-play');
+await mkdir(work, { recursive: true });
+const html = `<!doctype html><html lang="ja"><meta charset="utf-8"><style>*{box-sizing:border-box}html,body{margin:0;width:1024px;height:500px;overflow:hidden}body{font-family:Arial,'Hiragino Kaku Gothic ProN',sans-serif;background:#123e32;color:#f1f4df;position:relative;padding:62px}.eyebrow{font-size:15px;letter-spacing:4px;color:#ebc576;margin-bottom:23px}.title{font-size:68px;font-weight:700;letter-spacing:-2px;margin:0 0 20px}.tagline{font-size:34px;font-weight:600;margin:0 0 17px}.sub{font-size:21px;color:#c5d5c3;margin:0}.rule{width:60px;height:4px;background:#ebc576;margin-top:34px;border-radius:3px}.art{position:absolute;right:57px;top:117px;width:250px;height:250px;box-shadow:0 18px 50px #071e1860;border-radius:56px;overflow:hidden}.art svg{width:100%;height:100%}.ring{position:absolute;right:-95px;top:-74px;width:570px;height:570px;border:1px solid #dce8c21a;border-radius:50%;box-shadow:0 0 0 50px #dce8c207,0 0 0 100px #dce8c205}</style><div class="ring"></div><div class="eyebrow">CFA LEVEL I · STUDY</div><h1 class="title">CFA Pocket</h1><p class="tagline">5分を、未来の力に。</p><p class="sub">英語で解いて、日本語で理解する。</p><div class="rule"></div><div class="art">${iconSvg()}</div></html>`;
+const source = path.join(work, 'feature.html');
+await writeFile(source, html);
+const image = path.join(out, 'feature-graphic-1024x500.png');
+const chrome = process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const result = spawnSync(chrome, ['--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1024,500', `--user-data-dir=${path.join(work, 'chrome-profile')}`, `--screenshot=${image}`, pathToFileURL(source).href], { encoding: 'utf8', timeout: 60000 });
+if (result.error || result.status !== 0) throw Error('Feature graphic rendering failed. Set CHROME_BIN to a local Chrome executable.');
+const png = await readFile(image);
+if (png.readUInt32BE(16) !== 1024 || png.readUInt32BE(20) !== 500) throw Error('Unexpected feature graphic dimensions.');
+console.log('Created dist/google-play/store-icon-512.png and feature-graphic-1024x500.png. No personal browser profile was used.');

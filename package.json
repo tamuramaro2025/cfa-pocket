@@ -10,10 +10,18 @@
     "test": "node --test",
     "check:repository": "node scripts/check-repository.mjs",
     "build": "node scripts/build-mobile.mjs",
+    "deploy:web": "node scripts/deploy-pages.mjs",
     "build:android-web": "node scripts/build-android-web.mjs",
     "android:sync": "npm run build:android-web && cap sync android",
     "android:debug": "npm run android:sync && node scripts/android-debug.mjs",
-    "android:open": "cap open android"
+    "android:share": "node scripts/android-download.mjs",
+    "android:open": "cap open android",
+    "android:keys": "node scripts/android-keys.mjs",
+    "android:release": "node scripts/android-release.mjs",
+    "android:release:draft": "node scripts/android-release.mjs --draft",
+    "check:play": "node scripts/check-play-release.mjs",
+    "check:play:online": "node scripts/check-play-release.mjs --online",
+    "play:assets": "node scripts/build-store-assets.mjs"
   },
   "engines": {
     "node": ">=22"

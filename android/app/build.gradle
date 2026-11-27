@@ -1,14 +1,24 @@
 apply plugin: 'com.android.application'
 
+def releaseInfo = new groovy.json.JsonSlurper().parse(rootProject.file('../config/play-store.json'))
+def releaseCode = System.getenv('CFA_VERSION_CODE') ?: releaseInfo.versionCode.toString()
+def releaseName = System.getenv('CFA_VERSION_NAME') ?: releaseInfo.versionName
+if (!(releaseCode ==~ /[1-9][0-9]*/) || releaseCode.toLong() > 2100000000L) throw new GradleException('Invalid CFA_VERSION_CODE')
+def signingFile = rootProject.file('../.local/android-signing/signing.properties')
+def signingValues = new Properties()
+if (signingFile.exists()) signingFile.withReader('UTF-8') { signingValues.load(it) }
+def signingValue = { name -> System.getenv('CFA_' + name.replaceAll(/([A-Z])/, '_$1').toUpperCase()) ?: signingValues.getProperty(name) }
+def signingReady = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword'].every { signingValue(it) }
+
 android {
     namespace = "jp.cfapocket.study"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "jp.cfapocket.study"
+        applicationId releaseInfo.appId
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "0.1.0"
+        versionCode releaseCode.toInteger()
+        versionName releaseName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,12 +26,36 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    buildFeatures { buildConfig true }
+    signingConfigs {
+        if (signingReady) {
+            upload {
+                storeFile file(signingValue('storeFile'))
+                storePassword signingValue('storePassword')
+                keyAlias signingValue('keyAlias')
+                keyPassword signingValue('keyPassword')
+            }
+        }
+    }
     buildTypes {
         release {
+            debuggable false
+            if (signingReady) signingConfig signingConfigs.upload
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lint { abortOnError true; checkReleaseBuilds true }
+}
+
+tasks.register('validateUploadSigning') {
+    doLast {
+        if (!signingReady) throw new GradleException('Upload signing is required. Run npm run android:keys or configure CFA_STORE_FILE / CFA_STORE_PASSWORD / CFA_KEY_ALIAS / CFA_KEY_PASSWORD.')
+        if (file(signingValue('storeFile')).name == 'debug.keystore') throw new GradleException('The Android debug key cannot sign a Play release.')
+    }
+}
+tasks.configureEach { task ->
+    if (task.name == 'preReleaseBuild') task.dependsOn('validateUploadSigning')
 }
 
 repositories {

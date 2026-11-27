@@ -43,6 +43,9 @@ key.properties
 .openai/
 /mobile-site/
 
+# Separate Sites source repository, managed by the Sites workflow
+/sites/cfa-pocket-policy/
+
 # Dependencies, caches, compiled output and distribution archives
 node_modules/
 /www/

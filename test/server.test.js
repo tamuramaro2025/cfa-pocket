@@ -18,5 +18,9 @@ test('server serves home, modules and readiness endpoint', async t => {
     assert.equal(response.status, 200, asset);
   }
   assert.equal((await fetch(`${base}/missing-file`)).status, 404);
+  for (const route of ['/api/auth/session', '/account.js', '/delete-account.html', '/delete-account-page.js']) {
+    assert.equal((await fetch(base + route)).status, 404, route);
+  }
+  assert.equal((await fetch(`${base}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 404);
   assert.equal((await fetch(`${base}/..%2Fserver.mjs`)).status, 403);
 });

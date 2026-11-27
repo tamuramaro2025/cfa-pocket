@@ -2,6 +2,17 @@
 
 ## まず自分のスマホで使う
 
+Wi-Fiでダウンロードする場合:
+
+```sh
+npm run android:debug
+npm run android:share
+```
+
+スマホをMacと同じWi-Fiに接続し、表示されたURLをスマホのChromeで開く。「Android版をダウンロード」を押し、APKを開いてインストールする。配信中はMacを起動したままにする。停止はCtrl+C。インストール後のアプリはMacなしでも利用できる。共有するのは案内ページとAPKだけで、プロジェクトや学習記録は配信しない。コピーしたAPKは `dist/android/CFA-Pocket.apk` にも保存する。VPNなどで別のネットワークが選ばれた場合は `ANDROID_SHARE_HOST=MacのWi-FiのIPアドレス npm run android:share` で指定できる。
+
+USBでコピーする場合:
+
 1. Macの `android/app/build/outputs/apk/debug/app-debug.apk` をUSBなどでスマホのDownloadsにコピーする。外部サービスへのアップロードは不要。
 2. スマホのファイルアプリでAPKを開き、必要な場合だけ、そのファイルアプリに「不明なアプリのインストール」を許可する。
 3. 「CFA Pocket」をインストールして起動する。インストール後は上の許可を戻して構わない。

@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { units, unitStatus, curriculumQuestions } from '../public/curriculum.js';
-import { topics } from '../public/questions.js';
+import { topics, questions } from '../public/questions.js';
 import { guide, lesson } from '../public/learning-guide.js';
+import { vocabularyForUnit, questionsForUnit, allVocabulary, unitIdForQuestion } from '../public/vocabulary.js';
 import { makeQueue } from '../public/engine.js';
 
 test('curriculum has eight substantial units per topic with unique linked questions', () => {
@@ -41,6 +42,48 @@ test('guide filtering, empty results, lesson links and not-found state render', 
   assert.match(guide({ ...args, query: 'NO-MATCH-XYZ' }), /一致する単元がありません/);
   assert.match(lesson({ ...args, id: 'quant-probability' }), /3問ずつ演習/);
   assert.match(lesson({ ...args, id: 'does-not-exist' }), /単元が見つかりません/);
+});
+
+test('every unit has key English vocabulary and inspectable questions, and guide modes browse vocab and all questions', () => {
+  const unitIdSet = new Set(units.map(u => u.id));
+  for (const q of questions) {
+    const uid = unitIdForQuestion(q);
+    assert.ok(unitIdSet.has(uid), `Question ${q.id} should map to a valid unit, got ${uid}`);
+  }
+  for (const unit of units) {
+    const vocab = vocabularyForUnit(unit, questions);
+    const unitQs = questionsForUnit(unit, questions);
+    assert.ok(vocab.length >= 4, `${unit.id} has ${vocab.length} vocab items`);
+    assert.ok(unitQs.length >= 2, `${unit.id} has ${unitQs.length} questions`);
+  }
+  const totalVocab = allVocabulary(units, questions);
+  assert.ok(totalVocab.length >= 500);
+
+  const args = {
+    topics,
+    state: {
+      progress: { q1: { stage: 0, due: '2026-11-26', attempts: 1, correct: 0, lastCorrect: false, lastConfidence: 'unsure' } },
+      bookmarks: ['q1'],
+      readUnits: []
+    },
+    esc: s => String(s),
+    heading: (a, b, c = '') => `${a} ${b} ${c}`
+  };
+
+  const lessonHtml = lesson({ ...args, id: 'quant-cashflows' });
+  assert.match(lessonHtml, /この単元で学ぶべき英単語/);
+  assert.match(lessonHtml, /time-weighted return/);
+  assert.match(lessonHtml, /compounded annually/);
+  assert.match(lessonHtml, /この単元の問題を確認する/);
+  assert.match(lessonHtml, /選択肢と正解・日本語解説を見る/);
+
+  const vocabHtml = guide({ ...args, mode: 'vocab', topic: 'quant', query: 'skewness' });
+  assert.match(vocabHtml, /negative skewness/);
+  assert.match(vocabHtml, /負の歪度/);
+
+  const questionHtml = guide({ ...args, mode: 'questions', filter: 'saved', query: 'compounded' });
+  assert.match(questionHtml, /An investment of \$1,000 earns 5% annually/);
+  assert.match(questionHtml, /✓ 正解/);
 });
 
 test('new worked answers agree with independent calculations', () => {

@@ -37,13 +37,13 @@ test('backup validation reconstructs known data and rejects invalid values',()=>
   assert.equal(unknown.skipped,1);assert.equal(unknown.state.history.length,0);
 });
 
-async function workerHarness(failScript=false){
+async function workerHarness(failScript=false, pathname='/sw.js'){
   const handlers={},stores=new Map(),origin='https://pocket.test';let failed=false;let skip=false;
   const caches={
     async open(name){if(!stores.has(name))stores.set(name,new Map());const data=stores.get(name);return{async put(key,response){data.set(key,response.clone());},async match(key){return data.get(key)?.clone();}};},
     async keys(){return[...stores.keys()];},async delete(name){return stores.delete(name);}
   };
-  const self={location:{origin},clients:{claim:async()=>{}},skipWaiting:()=>{skip=true;},addEventListener:(name,fn)=>{handlers[name]=fn;}};
+  const self={location:{origin,pathname},clients:{claim:async()=>{}},skipWaiting:()=>{skip=true;},addEventListener:(name,fn)=>{handlers[name]=fn;}};
   class ScopedRequest extends Request{constructor(url,options){super(new URL(url,origin),options);}}
   const fetch=async request=>{
     if(failed)throw new Error('offline');
@@ -75,4 +75,15 @@ test('failed offline installation does not replace the previous cache',async()=>
   const h=await workerHarness(true);await h.caches.open('cfa-pocket-assets-old');let task;
   h.handlers.install({waitUntil:p=>{task=p;}});await assert.rejects(task,/Unexpected script/);
   assert.ok(h.stores.has('cfa-pocket-assets-old'));assert.ok(!h.stores.has('cfa-pocket-assets-test'));
+});
+test('service worker and dist manifest work under a GitHub Pages subpath (/cfa-pocket/)',async()=>{
+  const h=await workerHarness(false,'/cfa-pocket/sw.js');let task;
+  h.handlers.install({waitUntil:p=>{task=p;}});await task;
+  h.setOffline();let response;
+  h.handlers.fetch({request:new Request('https://pocket.test/cfa-pocket/app.js'),respondWith:p=>{response=p;}});
+  assert.match(await(await response).text(),/asset:\/cfa-pocket\/app.js/);
+  const distManifest=JSON.parse(await readFile(new URL('../mobile-site/dist/manifest.webmanifest',import.meta.url),'utf8'));
+  assert.equal(distManifest.start_url,'./#home');
+  assert.equal(distManifest.scope,'./');
+  assert.ok(distManifest.icons.every(i=>i.src.startsWith('./icons/')));
 });

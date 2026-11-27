@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="44" fill="#174b3c"/><path d="M48 130V85h22v45zm37 0V62h22v68zm37 0V42h22v88z" fill="#dce8c2"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 108 108">
+  <title>CFA Pocket — investment and growth</title>
+  <rect width="108" height="108" rx="24" fill="#174b3c"/>
+  <circle cx="40" cy="66" r="13" fill="#ebc576"/>
+  <circle cx="40" cy="66" r="9.3" fill="#c69c4e"/>
+  <circle cx="40" cy="66" r="8" fill="#ebc576"/>
+  <path d="M36.5,62 L40,66 L43.5,62" fill="none" stroke="#174b3c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40,66 L40,71" fill="none" stroke="#174b3c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36.5,67.5 L43.5,67.5" fill="none" stroke="#174b3c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M31,49 L44,39 L55,46 L74,32" fill="none" stroke="#f1f4df" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M62,32 L74,32 L74,44" fill="none" stroke="#f1f4df" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
